@@ -21,7 +21,7 @@ resource "aws_s3_bucket_versioning" "artifact_versioning" {
 # IAM Roles and Policies
 # --------------------
 
-## CodePipeline Role
+# CodePipeline Role
 data "aws_iam_policy_document" "codepipeline_assume" {
   statement {
     actions = ["sts:AssumeRole"]
@@ -59,7 +59,9 @@ resource "aws_iam_role_policy" "codepipeline_inline_policy" {
   })
 }
 
-## CodeBuild Role
+
+
+# CodeBuild Role
 data "aws_iam_policy_document" "codebuild_assume" {
   statement {
     actions = ["sts:AssumeRole"]
@@ -80,7 +82,7 @@ resource "aws_iam_role_policy_attachment" "codebuild_policy_attach" {
   policy_arn = "arn:aws:iam::aws:policy/AWSCodeBuildDeveloperAccess"
 }
 
-## CodeDeploy Role
+# CodeDeploy Role
 data "aws_iam_policy_document" "codedeploy_assume" {
   statement {
     actions = ["sts:AssumeRole"]
@@ -127,7 +129,7 @@ resource "aws_instance" "app_server" {
 }
 
 # --------------------
-# CodeDeploy Application & Deployment Group
+# CodeDeploy Application & Group
 # --------------------
 resource "aws_codedeploy_app" "devsecops_app" {
   name             = "${var.project_name}-app"
@@ -140,9 +142,10 @@ resource "aws_codedeploy_deployment_group" "devsecops_group" {
   service_role_arn      = aws_iam_role.codedeploy_role.arn
 
   deployment_style {
-    deployment_option = "WITHOUT_TRAFFIC_CONTROL"
-    deployment_type   = "IN_PLACE"
-  }
+  deployment_option = "WITHOUT_TRAFFIC_CONTROL"
+  deployment_type   = "IN_PLACE"
+}
+
 
   ec2_tag_set {
     ec2_tag_filter {
@@ -161,7 +164,7 @@ resource "aws_codedeploy_deployment_group" "devsecops_group" {
 }
 
 # --------------------
-# CodeBuild Project
+# CodeBuild
 # --------------------
 resource "aws_codebuild_project" "devsecops_build" {
   name          = "${var.project_name}-build"
@@ -196,7 +199,7 @@ resource "aws_codebuild_project" "devsecops_build" {
 # CodePipeline
 # --------------------
 resource "aws_codepipeline" "devsecops_pipeline" {
-  name     = "my-devops-project-pipeline"
+  name     = "${var.project_name}-pipeline"
   role_arn = aws_iam_role.codepipeline_role.arn
 
   artifact_store {
